@@ -1,0 +1,44 @@
+{
+  "name": "@zy/mcp-cos-markdown",
+  "version": "1.0.0",
+  "description": "A Model Context Protocol server for Tencent COS image upload",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && chmod 755 dist/index.js",
+    "start": "node dist/index.js ",
+    "dev": "ts-node src/index.ts",
+    "test": "vitest"
+  },
+  "main": "index.js",
+  "bin": "./dist/index.js",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "author": "jiangzhenyu",
+  "license": "ISC",
+  "keywords": [
+    "mcp",
+    "cos",
+    "tencent-cloud"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.1",
+    "cos-nodejs-sdk-v5": "^2.13.3",
+    "dotenv": "^16.4.5",
+    "mcp-server": "latest",
+    "zod": "^3.24.4"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^22.15.17",
+    "eslint": "^9.26.0",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3",
+    "vitest": "^3.1.3"
+  }
+}
