@@ -1,4 +1,4 @@
-import type { CommitOptions } from "./types.js";
+import type { CommitOptions } from "./types";
 
 export const defaultConfig: CommitOptions = {
   maxLineWidth: 100,

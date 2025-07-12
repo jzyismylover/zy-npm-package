@@ -1,8 +1,9 @@
 import inquirer from "inquirer";
 import chalk from "chalk";
 import wrap from "word-wrap";
-import { defaultConfig } from "./config.js";
-import type { CommitAnswers, CommitOptions } from "./types.js";
+import { defaultConfig } from "./config";
+import { buildScopeChoices } from "./utils";
+import type { CommitAnswers, CommitOptions } from "./types";
 
 export class ZyCommitizen {
   private options: CommitOptions;
@@ -24,19 +25,32 @@ export class ZyCommitizen {
         pageSize: 12,
       },
       {
-        type: "input",
-        name: "scope",
-        message: "影响范围 (可选):",
+        type: "list",
+        name: "scopeChoice",
+        message: "选择作用范围:",
+        choices: buildScopeChoices(this.options.scopes),
+        pageSize: 15,
         when: () =>
           this.options.allowCustomScopes ||
           (this.options.scopes && this.options.scopes.length > 0),
+      },
+      {
+        type: "input",
+        name: "customScope",
+        message: "请输入自定义作用范围:",
+        when: (answers: any) => {
+          return answers.scopeChoice === "custom";
+        },
         validate: (input: string) => {
-          if (!input) return true;
-          if (input.length > 10) {
-            return "范围不应超过10个字符";
+          if (!input || input.trim() === "") {
+            return "作用范围不能为空";
+          }
+          if (input.length > 15) {
+            return "范围不应超过15个字符";
           }
           return true;
         },
+        filter: (input: string) => input.trim(),
       },
       {
         type: "input",
@@ -77,8 +91,30 @@ export class ZyCommitizen {
     ];
 
     try {
-      const answers = (await inquirer.prompt(questions)) as CommitAnswers;
-      const message = this.formatCommitMessage(answers);
+      const answers = (await inquirer.prompt(questions)) as CommitAnswers & {
+        scopeChoice?: string;
+        customScope?: string;
+      };
+
+      // 处理 scope 逻辑
+      let finalScope: string | undefined;
+      if (answers.scopeChoice) {
+        finalScope =
+          answers.scopeChoice === "custom"
+            ? answers.customScope
+            : answers.scopeChoice;
+      }
+
+      const finalAnswers: CommitAnswers = {
+        type: answers.type,
+        scope: finalScope,
+        subject: answers.subject,
+        body: answers.body,
+        breaking: answers.breaking,
+        footer: answers.footer,
+      };
+
+      const message = this.formatCommitMessage(finalAnswers);
 
       console.log("\n" + chalk.green("生成的提交信息:"));
       console.log(chalk.gray("─".repeat(50)));
@@ -136,14 +172,25 @@ export class ZyCommitizen {
   }
 }
 
-// Commitizen适配器接口
+// 创建默认适配器实例
+const adapter = new ZyCommitizen();
+
+// 直接导出 prompter 方法以符合 Commitizen 期望
+export const prompter = adapter.prompter.bind(adapter);
+
+// 同时保留工厂函数导出以便自定义配置
 export default function (options: Partial<CommitOptions> = {}) {
-  const adapter = new ZyCommitizen(options);
+  const customAdapter = new ZyCommitizen(options);
   return {
-    prompter: adapter.prompter.bind(adapter),
+    prompter: customAdapter.prompter.bind(customAdapter),
   };
 }
 
 // 导出配置和类型
-export { defaultConfig } from "./config.js";
-export type { CommitAnswers, CommitOptions, CommitType } from "./types.js";
+export { defaultConfig } from "./config";
+export type { CommitAnswers, CommitOptions, CommitType } from "./types";
+export {
+  buildScopeChoices,
+  getModifiedFileScopes,
+  getProjectDirectories,
+} from "./utils";

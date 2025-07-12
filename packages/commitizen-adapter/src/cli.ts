@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { ZyCommitizen } from "./index.js";
+import { ZyCommitizen } from "./index";
 
 async function main() {
   const adapter = new ZyCommitizen();

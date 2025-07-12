@@ -1,8 +1,7 @@
 {
   "name": "@bestzy/commitizen-adapter",
-  "version": "2.0.0",
+  "version": "2.2.1",
   "description": "zy的Commitizen适配器，支持中文提示的约定式提交",
-  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "bin": {
@@ -11,11 +10,13 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "require": "./dist/index.js",
       "import": "./dist/index.js"
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "package.json"
   ],
   "scripts": {
     "build": "tsc",
@@ -35,8 +36,8 @@
     "access": "public"
   },
   "dependencies": {
-    "inquirer": "^9.2.12",
-    "chalk": "^5.3.0",
+    "inquirer": "^8.2.6",
+    "chalk": "^4.1.2",
     "word-wrap": "^1.2.5"
   },
   "peerDependencies": {
@@ -45,7 +46,8 @@
   "devDependencies": {
     "typescript": "^5.3.0",
     "rimraf": "^5.0.5",
-    "@types/inquirer": "^9.0.7",
-    "@types/word-wrap": "^1.2.1"
+    "@types/inquirer": "^8.2.10",
+    "@types/word-wrap": "^1.2.1",
+    "@types/node": "^20.0.0"
   }
 }
