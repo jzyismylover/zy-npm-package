@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import path from "path";
+import type { ProjectScanConfig } from "./types";
 
 export interface ScopeChoice {
   name: string;
@@ -8,12 +9,15 @@ export interface ScopeChoice {
 
 /**
  * 获取项目中所有目录列表作为 scope 选项
+ * @param {ProjectScanConfig} config - 项目扫描配置
  * @returns {string[]} 目录列表
  */
-export function getProjectDirectories(): string[] {
-  try {
-    // 获取当前项目的所有目录（排除 node_modules, .git 等）
-    const excludePatterns = [
+export function getProjectDirectories(
+  config: ProjectScanConfig = {}
+): string[] {
+  const {
+    packagesPrefix = "packages",
+    excludePatterns = [
       "node_modules",
       ".git",
       ".vscode",
@@ -21,26 +25,46 @@ export function getProjectDirectories(): string[] {
       "dist",
       "build",
       "coverage",
-      ".next",
-      ".nuxt",
-    ];
+    ],
+    enableAutoDetection = true,
+    maxDirectories = 20,
+    maxDepth = 5,
+  } = config;
 
-    // sed 's|pattern|replacement|flags'
-    const findCommand = `find . -type d -not -path '*/.*' | grep -v -E '(${excludePatterns.join(
-      "|"
-    )})' | sed 's|^./||' | head -50`;
+  if (!enableAutoDetection) {
+    return [];
+  }
+
+  try {
+    // 构建 find 命令，限制搜索深度
+    const depthLimit = maxDepth > 0 ? `-maxdepth ${maxDepth}` : "";
+
+    // 构建排除模式的 grep 命令
+    const excludePattern =
+      excludePatterns.length > 0
+        ? `| grep -v -E '(${excludePatterns.join("|")})'`
+        : "";
+
+    const findCommand = `find . ${depthLimit} -type d -not -path '*/.*' ${excludePattern} | sed 's|^./||' | head -${maxDirectories}`;
+
     const output = execSync(findCommand, { encoding: "utf8" });
-
     const directories = output
       .trim()
       .split("\n")
       .filter((dir) => dir && dir !== ".") // 过滤空目录和 . 目录
       .filter((dir, index, arr) => arr.indexOf(dir) === index) // 去重
-      .map((dir) => dir.replace("packages/", "")) // 移除 packages/ 前缀
+      .map((dir) => {
+        // 移除配置的前缀
+        if (packagesPrefix && dir.startsWith(`${packagesPrefix}/`)) {
+          return dir.replace(`${packagesPrefix}/`, "");
+        }
+        return dir;
+      })
       .map((dir) => dir.split("/")[0]) // 只取第一级目录
+      .filter((dir) => dir !== packagesPrefix) // 过滤掉前缀目录本身
       .sort();
 
-    return directories;
+    return Array.from(new Set(directories));
   } catch (error) {
     console.warn("获取项目目录失败:", (error as Error).message);
     return ["src", "lib", "components", "utils", "docs", "test"]; // 默认常见目录
@@ -49,9 +73,16 @@ export function getProjectDirectories(): string[] {
 
 /**
  * 获取当前 git 暂存区修改文件的父级目录
+ * @param {ProjectScanConfig} config - 项目扫描配置
  * @returns {string} 用 / 分割的目录列表
  */
-export function getModifiedFileScopes(): string {
+export function getModifiedFileScopes(config: ProjectScanConfig = {}): string {
+  const { packagesPrefix = "packages", enableAutoDetection = true } = config;
+
+  if (!enableAutoDetection) {
+    return "";
+  }
+
   try {
     // 获取暂存区的文件
     const stagedFiles = execSync("git diff --cached --name-only", {
@@ -66,10 +97,10 @@ export function getModifiedFileScopes(): string {
       if (!modifiedFiles.trim()) {
         return "";
       }
-      return extractScopes(modifiedFiles);
+      return extractScopes(modifiedFiles, packagesPrefix);
     }
 
-    return extractScopes(stagedFiles);
+    return extractScopes(stagedFiles, packagesPrefix);
   } catch (error) {
     console.warn("获取 git 修改文件失败:", (error as Error).message);
     return "";
@@ -79,9 +110,13 @@ export function getModifiedFileScopes(): string {
 /**
  * 从文件列表中提取父级目录
  * @param {string} fileList - 文件列表字符串
+ * @param {string} packagesPrefix - 包目录前缀
  * @returns {string} 用 / 分割的目录列表
  */
-export function extractScopes(fileList: string): string {
+export function extractScopes(
+  fileList: string,
+  packagesPrefix: string = "packages"
+): string {
   const files = fileList
     .trim()
     .split("\n")
@@ -89,16 +124,8 @@ export function extractScopes(fileList: string): string {
   const scopes = new Set<string>();
 
   files.forEach((file) => {
-    // 只匹配 monorepo packages 目录下的文件
-    if (!file.startsWith("packages")) {
-      return;
-    }
-    for (const dir of file.split("/")) {
-      if (dir !== "packages") {
-        scopes.add(dir);
-        break;
-      }
-    }
+    const dirs = file.split("/").filter((dir) => dir !== packagesPrefix);
+    scopes.add(dirs[0]);
   });
 
   return Array.from(scopes).join("/");
@@ -107,11 +134,15 @@ export function extractScopes(fileList: string): string {
 /**
  * 构建动态 scope 选择列表
  * @param staticScopes - 静态配置的 scope 列表
+ * @param config - 项目扫描配置
  * @returns ScopeChoice[] - 格式化的选择列表
  */
-export function buildScopeChoices(staticScopes: string[] = []): ScopeChoice[] {
-  const autoScope = getModifiedFileScopes();
-  const projectDirectories = getProjectDirectories();
+export function buildScopeChoices(
+  staticScopes: string[] = [],
+  config: ProjectScanConfig = {}
+): ScopeChoice[] {
+  const autoScope = getModifiedFileScopes(config);
+  const projectDirectories = getProjectDirectories(config);
 
   const choices: ScopeChoice[] = [];
 

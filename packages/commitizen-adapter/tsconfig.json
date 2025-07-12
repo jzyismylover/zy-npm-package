@@ -8,7 +8,7 @@
     "target": "ES2020",
     "declaration": true,
     "declarationMap": false,
-    "sourceMap": false,
+    "sourceMap": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true
   },
@@ -17,6 +17,7 @@
   ],
   "exclude": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "src/__test__"
   ]
 }

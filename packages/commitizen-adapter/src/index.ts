@@ -16,19 +16,24 @@ export class ZyCommitizen {
     console.log("\n" + chalk.blue("🎯 zy约定式提交助手"));
     console.log(chalk.gray("请按照以下步骤填写提交信息：\n"));
 
+    const czConfig = cz.config || {};
+
     const questions = [
       {
         type: "list",
         name: "type",
         message: "选择提交类型:",
-        choices: this.options.types,
+        choices: czConfig?.types || this.options.types,
         pageSize: 12,
       },
       {
         type: "list",
         name: "scopeChoice",
         message: "选择作用范围:",
-        choices: buildScopeChoices(this.options.scopes),
+        choices: buildScopeChoices(
+          this.options.scopes,
+          this.options.projectScan
+        ),
         pageSize: 15,
         when: () =>
           this.options.allowCustomScopes ||
@@ -188,7 +193,12 @@ export default function (options: Partial<CommitOptions> = {}) {
 
 // 导出配置和类型
 export { defaultConfig } from "./config";
-export type { CommitAnswers, CommitOptions, CommitType } from "./types";
+export type {
+  CommitAnswers,
+  CommitOptions,
+  CommitType,
+  ProjectScanConfig,
+} from "./types";
 export {
   buildScopeChoices,
   getModifiedFileScopes,

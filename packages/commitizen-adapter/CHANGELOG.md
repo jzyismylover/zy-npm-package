@@ -1,5 +1,11 @@
 # @bestzy/commitizen-adapter
 
+## 2.2.2
+
+### Patch Changes
+
+- 支持通过 commitizen 传参覆盖内部逻辑; 添加单元测试
+
 ## 2.2.1
 
 ### Patch Changes

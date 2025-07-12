@@ -5,6 +5,27 @@ export const defaultConfig: CommitOptions = {
   maxHeaderWidth: 72,
   allowCustomScopes: true,
   allowBreakingChanges: ["feat", "fix"],
+  projectScan: {
+    packagesPrefix: "packages",
+    excludePatterns: [
+      "node_modules",
+      ".git",
+      ".vscode",
+      ".idea",
+      "dist",
+      "build",
+      "coverage",
+      ".next",
+      ".nuxt",
+      ".DS_Store",
+      "temp",
+      "tmp",
+      "logs",
+    ],
+    enableAutoDetection: true,
+    maxDirectories: 50,
+    maxDepth: 3,
+  },
   types: [
     {
       value: "feat",
