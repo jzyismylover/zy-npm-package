@@ -11,17 +11,20 @@ type McpResult = {
 
 // 创建 MCP 服务器实例
 const server = new McpServer({
-  name: "cos-markdown-mcp",
+  name: "@modelcontextprotocol/cos-markdown-mcp",
   description: "腾讯云 COS 上传 MCP",
   version: "1.0.0",
 });
 
 // 注册上传图片到 COS 的工具
-server.tool(
+server.registerTool(
   "upload",
-  "上传一张图片到腾讯云 COS, 并返回上传地址",
   {
-    filePath: z.string().describe("图片本地路径"),
+    title: "上传一张图片到腾讯云 COS, 并返回上传地址",
+    description: "腾讯云 COS 上传工具",
+    inputSchema: {
+      filePath: z.string().describe("图片本地路径"),
+    },
   },
   async ({ filePath }: { filePath: string }): Promise<McpResult> => {
     try {
@@ -39,10 +42,15 @@ server.tool(
   },
 );
 
-server.tool(
+server.registerTool(
   "parser_markdown_image",
-  "替换 markdown 文件中的图片为腾讯云 COS 图片",
-  { filePath: z.string().describe("markdown 文件本地路径") },
+  {
+    title: "markdown 图片解析上传云端",
+    description: "替换 markdown 文件中的图片为腾讯云 COS 图片",
+    inputSchema: {
+      filePath: z.string().describe("markdown 文件本地路径"),
+    },
+  },
   async ({ filePath }: { filePath: string }): Promise<McpResult> => {
     let { markdown, replacements } = getMarkdownImagePaths(filePath);
 

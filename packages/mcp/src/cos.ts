@@ -1,4 +1,6 @@
 import COS from "cos-nodejs-sdk-v5";
+import dotenv from "dotenv";
+dotenv.config();
 
 export class COSService {
   private cos: COS;

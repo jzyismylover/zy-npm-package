@@ -1,6 +1,6 @@
 {
-  "name": "@zy/mcp-cos-markdown",
-  "version": "1.0.0",
+  "name": "@bestzy/mcp-cos-markdown",
+  "version": "2.0.0",
   "description": "A Model Context Protocol server for Tencent COS image upload",
   "type": "module",
   "scripts": {
