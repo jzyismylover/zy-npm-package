@@ -37,4 +37,6 @@ coverage/
 
 # Temporary
 tmp/
-temp/ 
+temp/
+
+.idea

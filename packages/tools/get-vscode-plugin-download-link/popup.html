@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Download Link</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            width: 320px;
+            padding: 16px;
+            margin: 0;
+            background-color: #f3f3f3;
+            color: #333;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 16px;
+            color: #007acc;
+        }
+        #result {
+            margin-top: 12px;
+            padding: 12px;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            word-break: break-all;
+            font-size: 13px;
+        }
+        .error {
+            color: #d32f2f;
+            background-color: #ffebee;
+        }
+        .success {
+            border-left: 4px solid #4caf50;
+        }
+        a.download-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 12px;
+            background-color: #007acc;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        a.download-btn:hover {
+            background-color: #005a9e;
+        }
+        .loading {
+            color: #666;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <h2>VS Code Extension Link</h2>
+    <div id="result" class="loading">Analyzing page...</div>
+    <script src="popup.js"></script>
+</body>
+</html>

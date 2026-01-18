@@ -1,0 +1,10 @@
+{
+  "name": "get-vscode-plugin-download-link",
+  "description": "through vscode marketplace link get actual download link. ",
+  "main": "index.js",
+  "scripts": {
+  },
+  "keywords": [],
+  "author": "zy",
+  "license": "ISC"
+}

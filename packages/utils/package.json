@@ -1,0 +1,13 @@
+{
+  "name": "@bestzy/utils",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jzyismylover/zy-npm-package.git"
+  },
+  "private": true
+}
